@@ -1,0 +1,11 @@
+# Binaries
+/bin
+/vendor
+
+# Go
+*.log
+*.out
+*.test
+
+# OS
+.DS_Store

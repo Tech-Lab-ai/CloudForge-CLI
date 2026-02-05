@@ -1,0 +1,47 @@
+# cloudforge.yaml - Arquivo de Configuração Principal
+# Define a infraestrutura a ser gerenciada pelo CloudForge.
+
+# Nome do projeto, usado para identificar recursos e estados.
+project: "cloudforge-demo"
+
+# Provedor de nuvem a ser utilizado. Valores válidos: "aws", "gcp", "azure".
+provider: "gcp"
+
+# Ambiente padrão a ser utilizado se nenhum for especificado nos comandos.
+default_environment: "dev"
+
+# Lista de ambientes (ex: dev, staging, prod). Cada ambiente pode ter sua própria configuração.
+environments:
+  - name: "dev"
+    # Configurações para recursos de computação (VMs, etc.)
+    compute:
+      instance_type: "e2-medium" # Tipo de instância/máquina
+      image: "ubuntu-os-cloud/ubuntu-2204-lts" # Imagem do SO
+      replicas: 1 # Número de instâncias
+
+    # Configurações de rede
+    network:
+      vpc_cidr: "10.0.0.0/16"
+      subnets:
+        - "10.0.1.0/24"
+
+    # Configurações de armazenamento
+    storage:
+      bucket_name: "cloudforge-demo-bucket-dev"
+      public_read: false
+
+  - name: "prod"
+    compute:
+      instance_type: "n2-standard-2"
+      image: "ubuntu-os-cloud/ubuntu-2204-lts"
+      replicas: 3
+
+    network:
+      vpc_cidr: "10.10.0.0/16"
+      subnets:
+        - "10.10.1.0/24"
+        - "10.10.2.0/24"
+
+    storage:
+      bucket_name: "cloudforge-demo-bucket-prod"
+      public_read: false

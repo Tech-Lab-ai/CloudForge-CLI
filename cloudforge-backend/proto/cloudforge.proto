@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "cloudforge/proto";
+
+// CloudForgeService define o contrato gRPC para comunicação entre a CLI e a Engine.
+// Este serviço orquestra todas as operações de provisionamento, sincronização e gerenciamento de estado.
+service CloudForgeService {
+  // Init inicializa um novo projeto CloudForge, validando a configuração inicial.
+  rpc Init(InitRequest) returns (InitResponse);
+
+  // Deploy provisiona a infraestrutura com base na configuração do ambiente especificado.
+  // Retorna o status da operação e a versão do estado gerado.
+  rpc Deploy(DeployRequest) returns (DeployResponse);
+
+  // Sync sincroniza os arquivos locais, variáveis de ambiente e secrets com o ambiente remoto.
+  rpc Sync(SyncRequest) returns (SyncResponse);
+
+  // Status verifica o estado atual da infraestrutura, incluindo detecção de drift.
+  rpc Status(StatusRequest) returns (StatusResponse);
+
+  // Destroy remove todos os recursos provisionados para um ambiente específico.
+  rpc Destroy(DestroyRequest) returns (DestroyResponse);
+}
+
+// --- Mensagens de Requisição e Resposta ---
+
+// Init
+message InitRequest {
+  string project_id = 1;
+  string provider = 2;
+  string environment = 3; // ex: "dev", "prod"
+}
+
+message InitResponse {
+  string status = 1;
+  string message = 2; // ex: "Projeto 'x' inicializado com sucesso."
+}
+
+// Deploy
+message DeployRequest {
+  string environment = 1;
+}
+
+message DeployResponse {
+  string status = 1;
+  string message = 2;
+  string state_version = 3;
+}
+
+// Sync
+message SyncRequest {
+  string environment = 1;
+  bool dry_run = 2;
+}
+
+message SyncResponse {
+  string status = 1;
+  repeated string files_synced = 2;
+  repeated string envs_updated = 3;
+}
+
+// Status
+message ResourceStatus {
+    string name = 1;
+    string type = 2;
+    string status = 3;
+}
+
+message StatusRequest {
+  string environment = 1;
+}
+
+message StatusResponse {
+  string status = 1;
+  string provider = 2;
+  string state_version = 3;
+  bool drift_detected = 4;
+  repeated ResourceStatus resources = 5;
+}
+
+// Destroy
+message DestroyRequest {
+  string environment = 1;
+  bool force = 2; // Para pular a confirmação
+}
+
+message DestroyResponse {
+  string status = 1;
+  string message = 2;
+}
