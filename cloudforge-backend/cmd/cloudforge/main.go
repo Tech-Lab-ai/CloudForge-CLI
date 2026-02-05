@@ -1,7 +1,9 @@
 package main
 
-import "cloudforge-backend/internal/cli"
+import (
+	"cloudforge/internal/cli"
+)
 
 func main() {
-  cli.Execute()
+	cli.Execute()
 }

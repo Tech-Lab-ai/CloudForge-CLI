@@ -3,7 +3,7 @@ package state
 import (
 	"fmt"
 	"sync"
-    "cloudforge/internal/config"
+    "cloudforge-backend/internal/config"
 )
 
 // State representa a configuração e o estado atual da infraestrutura gerenciada.

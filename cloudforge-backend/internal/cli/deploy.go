@@ -1,34 +1,34 @@
 package cli
 
 import (
+	"context"
 	"fmt"
-	"log"
 
+	"cloudforge/proto"
 	"github.com/spf13/cobra"
 )
 
+// deployCmd representa o comando `cloudforge deploy`
 var deployCmd = &cobra.Command{
 	Use:   "deploy",
-	Short: "Deploy the infrastructure defined in cloudforge.yaml",
+	Short: "Provisiona ou atualiza a infraestrutura de acordo com a configuração.",
+	Long: `O comando deploy analisa o arquivo de configuração, compara com o estado
+   atual e aplica as mudanças necessárias no provedor de nuvem para que a
+   infraestrutura real corresponda à configuração desejada.
+    `,
 	Run: func(cmd *cobra.Command, args []string) {
-		config, err := readConfig()
-		if err != nil {
-			log.Fatalf("error reading config: %v", err)
+		req := &proto.DeployRequest{
+			Environment: environment,
 		}
 
-		provider, err := getProvider(config.Provider)
+		fmt.Println("🚀 Disparando o processo de deploy...")
+
+		resp, err := grpcClient.Deploy(context.Background(), req)
 		if err != nil {
-			log.Fatalf("error getting provider: %v", err)
+			fmt.Printf("❌ Erro durante o deploy: %v\n", err)
+			return
 		}
 
-		path, _ := cmd.Flags().GetString("path")
-
-		fmt.Println("Deploying infrastructure...")
-		provider.Deploy(path)
+		fmt.Printf("✅ %s (Versão do Estado: %d)\n", resp.Message, resp.StateVersion)
 	},
-}
-
-func init() {
-	deployCmd.Flags().String("path", ".", "The path to the application to be deployed")
-	rootCmd.AddCommand(deployCmd)
 }
